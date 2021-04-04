@@ -132,7 +132,6 @@ class Sentence:
         if cell in self.cells:
             self.cells.remove(cell)
 
-
 class MinesweeperAI:
     """
     Minesweeper game player
@@ -198,6 +197,29 @@ class MinesweeperAI:
             if sentence.known_mines() is not None and len(sentence.known_mines()) > 0:
                 for cell in sentence.known_mines():
                     self.mark_mine(cell)
+
+        if len(self.safes) > 0:
+            new_safe_moves = self.safes.symmetric_difference(self.moves_made)
+            if len(new_safe_moves) == 0:
+                for sentence in self.knowledge:
+                    if len(sentence.cells) == 0:
+                        continue
+                    self.inner(sentence)
+
+    def inner(self, sentence):
+        for sentence2 in self.knowledge:
+            if len(sentence2.cells) == 0:
+                continue
+            if sentence.cells != sentence2.cells and sentence2.cells.issubset(sentence.cells):
+                new_sentence = Sentence(sentence.cells.symmetric_difference(sentence2.cells), sentence.count - sentence2.count)
+                if new_sentence.count == 0:
+                    for cell in new_sentence.cells:
+                        self.mark_safe(cell)
+                elif 0 < new_sentence.count == len(new_sentence.cells):
+                    for cell in new_sentence.cells:
+                        self.mark_mine(cell)
+                self.knowledge.append(new_sentence)
+                return
 
     def get_cell_neighbors(self, cell):
         row = cell[0]
