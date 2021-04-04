@@ -12,6 +12,7 @@ MINES = 8
 BLACK = (0, 0, 0)
 GRAY = (180, 180, 180)
 WHITE = (255, 255, 255)
+GREEN = (75, 139, 59)
 
 # Create game
 pygame.init()
@@ -44,6 +45,7 @@ ai = MinesweeperAI(height=HEIGHT, width=WIDTH)
 # Keep track of revealed cells, flagged cells, and if a mine was hit
 revealed = set()
 flags = set()
+safe_tiles = set()
 lost = False
 
 # Show instructions initially
@@ -126,6 +128,8 @@ while True:
                 neighborsTextRect = neighbors.get_rect()
                 neighborsTextRect.center = rect.center
                 screen.blit(neighbors, neighborsTextRect)
+            elif (i, j) in safe_tiles:
+                screen.fill(GREEN, rect)
 
             row.append(rect)
         cells.append(row)
@@ -198,6 +202,7 @@ while True:
             ai = MinesweeperAI(height=HEIGHT, width=WIDTH)
             revealed = set()
             flags = set()
+            safe_tiles = ()
             lost = False
             continue
 
@@ -219,5 +224,6 @@ while True:
             revealed.add(move)
             ai.add_knowledge(move, nearby)
             flags = ai.mines.copy()
+            safe_tiles = ai.safes.copy()
 
     pygame.display.flip()
