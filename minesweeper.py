@@ -124,7 +124,6 @@ class Sentence():
             self.cells.remove(cell)
             self.count -= 1
 
-
     def mark_safe(self, cell):
         """
         Updates internal knowledge representation given the fact that
@@ -190,9 +189,16 @@ class MinesweeperAI():
         """
         self.moves_made.add(cell)
         self.mark_safe(cell)
-        self.knowledge.append(Sentence(cell, count))
+        self.knowledge.append(Sentence({cell}, count))
         cell_neighbors = self.get_cell_neighbors(cell)
         self.knowledge.append(Sentence(cell_neighbors, count))
+        for sentence in self.knowledge:
+            if sentence.known_safes() is not None and len(sentence.known_safes()) > 0:
+                for cell in sentence.known_safes():
+                    self.mark_safe(cell)
+            if sentence.known_mines() is not None and len(sentence.known_mines()) > 0:
+                for cell in sentence.known_mines():
+                    self.mark_mine(cell)
 
     def get_cell_neighbors(self, cell):
         row = cell[0]
